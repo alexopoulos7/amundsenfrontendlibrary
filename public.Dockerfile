@@ -1,4 +1,12 @@
+FROM node:8 as node-stage
+COPY . /app
+WORKDIR /app/amundsen_application/static
+RUN npm install
+RUN npm rebuild node-sass
+RUN npm run build
+
 FROM python:3
+COPY --from=node-stage /app /app
 WORKDIR /app
 COPY . /app
 RUN pip3 install -r requirements3.txt

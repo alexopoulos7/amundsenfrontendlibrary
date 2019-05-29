@@ -394,6 +394,43 @@ def put_column_description() -> Response:
         return make_response(payload, HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
+@metadata_blueprint.route('/put_column_team', methods=['PUT'])
+def put_column_team() -> Response:
+
+    @action_logging
+    def _log_put_column_team(*, table_key: str, column_name: str, team: str, source: str) -> None:
+        pass  # pragma: no cover
+
+    try:
+        args = request.get_json()
+
+        table_key = _get_table_key(args)
+        table_endpoint = _get_table_endpoint()
+
+        column_name = get_query_param(args, 'column_name')
+        team = get_query_param(args, 'team')
+        team = ' '.join(team.split())
+
+        src = get_query_param(args, 'source')
+
+        url = '{0}/{1}/column/{2}/team/{3}'.format(table_endpoint, table_key, column_name, team)
+        _log_put_column_team(table_key=table_key, column_name=column_name, team=team, source=src)
+
+        response = request_metadata(url=url, method='PUT')
+        status_code = response.status_code
+
+        if status_code == HTTPStatus.OK:
+            message = 'Success'
+        else:
+            message = 'Update column team failed'
+
+        payload = jsonify({'msg': message})
+        return make_response(payload, status_code)
+    except Exception as e:
+        payload = jsonify({'msg': 'Encountered exception: ' + str(e)})
+        return make_response(payload, HTTPStatus.INTERNAL_SERVER_ERROR)
+
+
 @metadata_blueprint.route('/tags')
 def get_tags() -> Response:
     """

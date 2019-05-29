@@ -9,6 +9,7 @@ import {
   GetTableDescription, GetTableDescriptionRequest,
   UpdateColumnDescription, UpdateColumnDescriptionRequest,
   UpdateTableDescription, UpdateTableDescriptionRequest,
+  GetColumnTeam, UpdateColumnTeam, GetColumnTeamRequest, UpdateColumnTeamRequest
 } from './types';
 
 import {
@@ -17,8 +18,10 @@ import {
   metadataGetTableData,
   metadataGetColumnDescription,
   metadataGetTableDescription,
+  metadataGetColumnTeam,
   metadataUpdateColumnDescription,
   metadataUpdateTableDescription,
+  metadataUpdateColumnTeam
 } from './api/v0';
 
 // getTableData
@@ -116,6 +119,48 @@ export function* updateColumnDescriptionWorker(action: UpdateColumnDescriptionRe
 export function* updateColumnDescriptionWatcher(): SagaIterator {
   yield takeEvery(UpdateColumnDescription.ACTION, updateColumnDescriptionWorker);
 }
+
+// getColumnTeam
+export function* getColumnTeamWorker(action: GetColumnTeamRequest): SagaIterator {
+  const state = yield select();
+  let tableData;
+  try {
+    tableData = yield call(metadataGetColumnTeam, action.columnIndex, state.tableMetadata.tableData);
+    yield put({ type: GetColumnTeam.SUCCESS, payload: tableData });
+    if (action.onSuccess) {
+      yield call(action.onSuccess);
+    }
+  } catch (e) {
+    yield put({ type: GetColumnTeam.FAILURE, payload: tableData });
+    if (action.onFailure) {
+      yield call(action.onFailure);
+    }
+  }
+}
+
+export function* getColumnTeamWatcher(): SagaIterator {
+  yield takeEvery(GetColumnTeam.ACTION, getColumnTeamWorker);
+}
+
+// updateColumnTeam
+export function* updateColumnTeamWorker(action: UpdateColumnTeamRequest): SagaIterator {
+  const state = yield select();
+  try {
+    yield call(metadataUpdateColumnTeam, action.newValue, action.columnIndex, state.tableMetadata.tableData);
+    if (action.onSuccess) {
+      yield call(action.onSuccess);
+    }
+  } catch (e) {
+    if (action.onFailure) {
+      yield call(action.onFailure);
+    }
+  }
+}
+
+export function* updateColumnTeamWatcher(): SagaIterator {
+  yield takeEvery(UpdateColumnTeam.ACTION, updateColumnTeamWorker);
+}
+
 
 // getLastIndexed
 export function* getLastIndexedWorker(action: GetLastIndexedRequest): SagaIterator {

@@ -2,6 +2,7 @@ import * as React from 'react';
 import moment from 'moment-timezone';
 
 import ColumnDescEditableText from 'components/TableDetail/ColumnDescEditableText';
+import ColumnTeamEditableText from 'components/TableDetail/ColumnTeamEditableText';
 import { TableColumn } from 'components/TableDetail/types';
 import { logClick } from 'ducks/utilMethods';
 
@@ -75,7 +76,8 @@ class DetailListItem extends React.Component<DetailListItemProps, DetailListItem
           <div style={{ width: '100%', display: 'inline-grid' }}>
             <div className='title-row'>
               <div className='name title-2'>{metadata.name}</div>
-              <div className='column-type'>{metadata.type || 'null'}</div>
+              <div className='column-type'>{metadata.type || 'null'}</div>              
+              <div className='column-type'> pii = {metadata.pii.toString()}</div>              
             </div>
           </div>
           {
@@ -88,6 +90,13 @@ class DetailListItem extends React.Component<DetailListItemProps, DetailListItem
             columnIndex={this.props.index}
             editable={metadata.is_editable}
             value={metadata.description}
+          />
+        </div>
+        <div className={'body-secondary-3 description ' + (isExpandable && !this.state.isExpanded ? 'truncated' : '')}>
+          <ColumnTeamEditableText
+            columnIndex={this.props.index}
+            editable={metadata.is_editable}
+            value={metadata.team}
           />
         </div>
         {

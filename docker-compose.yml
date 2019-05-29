@@ -1,0 +1,76 @@
+version: '3'
+services:
+  neo4j:
+      image: neo4j:3.3.0
+      container_name: neo4j_amundsen
+      environment:
+        - CREDENTIALS_PROXY_USER=neo4j
+        - CREDENTIALS_PROXY_PASSWORD=neo4j
+      ulimits:
+        nofile:
+          soft: 40000
+          hard: 40000
+      ports:
+          - 7474:7474
+          - 7687:7687
+      volumes:
+          - ./example/docker/neo4j/conf:/conf
+      networks:
+        - amundsennet
+  elasticsearch:
+      image: elasticsearch:6.7.0
+      container_name: es_amundsen
+      ports:
+          - 9200:9200
+      networks:
+        - amundsennet
+  amundsensearch:
+      build:
+        context: ../amundsensearchlibrary
+        dockerfile: public.Dockerfile
+      container_name: amundsensearch
+      ports:
+        - 5001:5000
+      depends_on:
+        - elasticsearch
+      networks:
+        - amundsennet
+      environment: 
+        - ELASTICSEARCH_ENDPOINT:http://elasticsearch:9200
+        - ELASTICSEARCH_BASE=http://elasticsearch:9200
+  amundsenmetadata:
+      build:
+        context: ../amundsenmetadatalibrary
+        dockerfile: public.Dockerfile      
+      container_name: amundsenmetadata
+      depends_on:
+        - neo4j
+      ports:
+        - 5002:5000
+      networks:
+        - amundsennet
+      environment:
+        - CREDENTIALS_PROXY_USER=neo4j
+        - CREDENTIALS_PROXY_PASSWORD=test
+        - PROXY_HOST=bolt://neo4j
+        - PROXY_PORT=7687
+        - PROXY_CLIENT=NEO4J
+  amundsenfrontend:
+      build:
+        context: .
+        dockerfile: public.Dockerfile
+      container_name: amundsenfrontend
+      container_name: amundsenfrontend
+      depends_on:
+        - amundsenmetadata
+        - amundsensearch
+      ports:
+        - 5000:5000
+      networks:
+        - amundsennet
+      environment:
+        - SEARCHSERVICE_BASE=http://amundsensearch:5000
+        - METADATASERVICE_BASE=http://amundsenmetadata:5000 
+
+networks:
+  amundsennet:

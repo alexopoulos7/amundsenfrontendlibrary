@@ -4,7 +4,7 @@ import { Effect } from 'redux-saga';
 import {
   DescriptionResponse, LastIndexedResponse, PreviewDataResponse, TableDataResponse,
   GetPreviewDataRequest, GetTableDataRequest, UpdateTableOwnerRequest, UpdateTagsRequest,
-  PreviewData, TableMetadata, User, Tag
+  PreviewData, TableMetadata, User, Tag, TeamResponse
 } from 'ducks/tableMetadata/types';
 
 const API_PATH = '/api/metadata/v0';
@@ -142,6 +142,39 @@ export function metadataUpdateColumnDescription(description: string, columnIndex
     const columnName = tableData.columns[columnIndex].name;
     return axios.put(`${API_PATH}/put_column_description`, {
       description,
+      db: tableData.database,
+      cluster: tableData.cluster,
+      column_name: columnName,
+      schema: tableData.schema,
+      table: tableData.table_name,
+      source: 'user',
+    });
+  }
+}
+
+
+export function metadataGetColumnTeam(columnIndex: number, tableData: TableMetadata) {
+  const tableParams = getTableParams(tableData);
+  const columnName = tableData.columns[columnIndex].name;
+  return axios.get(`${API_PATH}/get_column_team?${tableParams}&column_name=${columnName}`)
+  .then((response: AxiosResponse<TeamResponse>) => {
+    tableData.columns[columnIndex].team = response.data.team;
+    return tableData;
+  })
+  .catch((error: AxiosError) => {
+    return tableData;
+  });
+}
+
+export function metadataUpdateColumnTeam(team: string, columnIndex: number, tableData: TableMetadata) {
+  if (team.length === 0) {
+    throw new Error();
+  }
+  else {
+    const columnName = tableData.columns[columnIndex].name;
+    
+    return axios.put(`${API_PATH}/put_column_team`, {
+      team,
       db: tableData.database,
       cluster: tableData.cluster,
       column_name: columnName,

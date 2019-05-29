@@ -63,6 +63,8 @@ export interface TableColumn {
   description: string;
   is_editable: boolean;
   type: string;
+  team: string;
+  pii: boolean;
   stats: TableColumnStats[];
 }
 

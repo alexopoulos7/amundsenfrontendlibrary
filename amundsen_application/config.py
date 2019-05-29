@@ -16,8 +16,8 @@ class Config:
 
 
 class LocalConfig(Config):
-    DEBUG = False
-    TESTING = False
+    DEBUG = True
+    TESTING = True
     LOG_LEVEL = 'DEBUG'
 
     # If installing locally directly from the github source

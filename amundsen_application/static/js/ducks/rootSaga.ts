@@ -21,6 +21,8 @@ import {
   getTableDescriptionWatcher,
   updateColumnDescriptionWatcher,
   updateTableDescriptionWatcher,
+  getColumnTeamWatcher,
+  updateColumnTeamWatcher
 } from './tableMetadata/sagas';
 
 // Tags
@@ -47,10 +49,12 @@ export default function* rootSaga() {
     getLastIndexedWatcher(),
     getPreviewDataWatcher(),
     getTableDescriptionWatcher(),
+    getColumnTeamWatcher(),
     updateColumnDescriptionWatcher(),
     updateTableDescriptionWatcher(),
     updateTableOwnerWatcher(),
     updateTableTagsWatcher(),
+    updateColumnTeamWatcher(),
     // User
     getLoggedInUserWatcher(),
     getUserWatcher(),

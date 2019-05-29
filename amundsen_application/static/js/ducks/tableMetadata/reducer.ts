@@ -8,6 +8,8 @@ import {
   GetPreviewData, GetPreviewDataRequest, GetPreviewDataResponse, PreviewQueryParams, PreviewDataState,
   UpdateTableOwner,
   UpdateTags,
+  GetColumnPiiRequest, GetColumnPiiResponse, GetColumnPii, UpdateColumnTeamRequest, UpdateColumnTeamResponse, UpdateColumnPii,
+  GetColumnTeamResponse, GetColumnTeamRequest, GetColumnTeam, UpdateColumnPiiRequest, UpdateColumnPiiResponse, UpdateColumnTeam
 } from './types';
 
 import tableOwnersReducer, {
@@ -22,11 +24,15 @@ export type TableMetadataReducerAction =
   GetTableDataRequest | GetTableDataResponse |
   GetTableDescriptionRequest | GetTableDescriptionResponse |
   UpdateTableDescriptionRequest | UpdateTableDescriptionResponse |
+  GetColumnTeamRequest | GetColumnTeamResponse |
+  UpdateColumnTeamRequest | UpdateColumnTeamResponse |
+  GetColumnPiiRequest | GetColumnPiiResponse |
+  UpdateColumnPiiRequest | UpdateColumnPiiResponse |
   GetColumnDescriptionRequest | GetColumnDescriptionResponse |
   UpdateColumnDescriptionRequest | UpdateColumnDescriptionResponse |
   GetLastIndexedRequest | GetLastIndexedResponse |
   GetPreviewDataRequest | GetPreviewDataResponse |
-  TableOwnerReducerAction | TableTagsReducerAction ;
+  TableOwnerReducerAction | TableTagsReducerAction;
 
 export interface TableMetadataReducerState {
   isLoading: boolean;
@@ -83,6 +89,44 @@ export function updateColumnDescription(newValue: string, columnIndex: number, o
     onSuccess,
     onFailure,
     type: UpdateColumnDescription.ACTION,
+  };
+}
+
+export function getColumnTeam(columnIndex: number, onSuccess?: () => any, onFailure?: () => any): GetColumnTeamRequest {
+  return {
+    onSuccess,
+    onFailure,
+    columnIndex,
+    type: GetColumnTeam.ACTION,
+  };
+}
+
+export function updateColumnTeam(newValue: string, columnIndex: number, onSuccess?: () => any, onFailure?: () => any): UpdateColumnTeamRequest {
+  return {
+    newValue,
+    columnIndex,
+    onSuccess,
+    onFailure,
+    type: UpdateColumnTeam.ACTION,
+  };
+}
+
+export function getColumnPii(columnIndex: number, onSuccess?: () => any, onFailure?: () => any): GetColumnPiiRequest {
+  return {
+    onSuccess,
+    onFailure,
+    columnIndex,
+    type: GetColumnPii.ACTION,
+  };
+}
+
+export function updateColumnPii(newValue: boolean, columnIndex: number, onSuccess?: () => any, onFailure?: () => any): UpdateColumnPiiRequest {
+  return {
+    newValue,
+    columnIndex,
+    onSuccess,
+    onFailure,
+    type: UpdateColumnPii.ACTION,
   };
 }
 
@@ -167,6 +211,11 @@ export default function reducer(state: TableMetadataReducerState = initialState,
       return { ...state, preview: initialPreviewState };
     case GetPreviewData.SUCCESS:
       return { ...state, preview: action.payload };
+    case GetColumnPii.SUCCESS:
+      return { ...state, tableData: action.payload };
+    case GetColumnTeam.SUCCESS:
+      return { ...state, tableData: action.payload };
+
     case UpdateTableOwner.ACTION:
     case UpdateTableOwner.FAILURE:
     case UpdateTableOwner.SUCCESS:
